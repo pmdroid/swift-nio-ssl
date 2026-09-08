@@ -30,6 +30,9 @@ import Musl
 import Glibc
 #elseif canImport(Android)
 import Android
+#elseif canImport(ucrt)
+import ucrt
+import WinSDK
 #else
 #error("unsupported os")
 #endif
@@ -38,6 +41,16 @@ import Android
 internal typealias FILEPointer = OpaquePointer
 #else
 internal typealias FILEPointer = UnsafeMutablePointer<FILE>
+#endif
+
+#if os(Windows)
+private var errno: CInt { ucrt._errno().pointee }
+private func mlock(_ addr: UnsafeRawPointer?, _ len: Int) -> CInt { 0 }
+private func munlock(_ addr: UnsafeRawPointer?, _ len: Int) -> CInt { 0 }
+private func lstat(_ path: UnsafePointer<CChar>?, _ buf: UnsafeMutablePointer<stat>?) -> CInt {
+    stat(path, buf)
+}
+private func readlink(_ path: UnsafePointer<CChar>?, _ buf: UnsafeMutablePointer<CChar>?, _ bufsiz: Int) -> Int { -1 }
 #endif
 
 private let sysFopen = fopen

@@ -24,6 +24,9 @@ import Musl
 import Glibc
 #elseif canImport(Android)
 import Android
+#elseif canImport(ucrt)
+import ucrt
+import WinSDK
 #else
 #error("unsupported os")
 #endif
@@ -45,7 +48,9 @@ internal enum FileSystemObject {
             return nil
         }
 
-        #if os(Android) && arch(arm)
+        #if os(Windows)
+        return (CInt(statObj.st_mode) & CInt(S_IFDIR)) != 0 ? .directory : .file
+        #elseif os(Android) && arch(arm)
         return (statObj.st_mode & UInt32(S_IFDIR)) != 0 ? .directory : .file
         #else
         return (statObj.st_mode & S_IFDIR) != 0 ? .directory : .file
@@ -790,7 +795,9 @@ extension NIOSSLContext {
         var buffer = stat()
         let _ = try Posix.lstat(path: path, buf: &buffer)
         // Check the mode to make sure this is a symlink
-        #if os(Android) && arch(arm)
+        #if os(Windows)
+        return false
+        #elseif os(Android) && arch(arm)
         if (buffer.st_mode & UInt32(S_IFMT)) != UInt32(S_IFLNK) { return false }
         #else
         if (buffer.st_mode & S_IFMT) != S_IFLNK { return false }
@@ -911,6 +918,13 @@ extension Optional where Wrapped == String {
     }
 }
 
+#if os(Windows)
+internal class DirectoryContents: Sequence, IteratorProtocol {
+    typealias Element = String
+    init(path: String) {}
+    func next() -> String? { nil }
+}
+#else
 internal class DirectoryContents: Sequence, IteratorProtocol {
 
     typealias Element = String
@@ -945,6 +959,7 @@ internal class DirectoryContents: Sequence, IteratorProtocol {
         closedir(dir)
     }
 }
+#endif
 
 // Used as part of the `_isRehashFormat` format to determine if the filename is a hexadecimal filename.
 extension UTF8.CodeUnit {

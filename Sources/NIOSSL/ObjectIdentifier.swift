@@ -119,7 +119,7 @@ extension NIOSSLObjectIdentifier: Hashable {
         self.storage.withReference { reference in
             let length = CNIOBoringSSL_OBJ_length(reference)
             let data = CNIOBoringSSL_OBJ_get0_data(reference)
-            let buffer = UnsafeRawBufferPointer(start: data, count: length)
+            let buffer = UnsafeRawBufferPointer(start: data, count: Int(length))
             hasher.combine(bytes: buffer)
         }
     }

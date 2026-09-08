@@ -12,7 +12,9 @@
 //
 //===----------------------------------------------------------------------===//
 
+#if canImport(CNIOLinux)
 import CNIOLinux
+#endif
 import NIOCore
 
 #if canImport(Darwin)
@@ -23,6 +25,9 @@ import Musl
 import Glibc
 #elseif canImport(Android)
 import Android
+#elseif canImport(ucrt)
+import ucrt
+import WinSDK
 #else
 #error("unsupported os")
 #endif

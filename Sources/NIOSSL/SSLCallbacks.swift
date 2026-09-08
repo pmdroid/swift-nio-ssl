@@ -23,6 +23,9 @@ import Musl
 import Glibc
 #elseif canImport(Bionic)
 import Bionic
+#elseif canImport(ucrt)
+import ucrt
+import WinSDK
 #else
 #error("unsupported os")
 #endif
