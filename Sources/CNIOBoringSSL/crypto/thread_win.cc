@@ -18,6 +18,10 @@
 
 #if defined(OPENSSL_WINDOWS_THREADS)
 
+#ifndef p_thread_callback_boringssl
+#define p_thread_callback_boringssl p_thread_callback_cnio_boringssl
+#endif
+
 OPENSSL_MSVC_PRAGMA(warning(push, 3))
 #include <windows.h>
 OPENSSL_MSVC_PRAGMA(warning(pop))
